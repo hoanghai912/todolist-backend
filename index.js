@@ -2,12 +2,14 @@
 const express = require('express');
 const app = express();
 const morgan = require('morgan')
+const cors = require('cors')
 require('dotenv').config()
 const Todos = require('./models/todo')
 
 // Middleware
 app.use(express.json())
 app.use(morgan('tiny'))
+app.use(cors())
 
 // Routes
 app.get('/',(req,res)=>{
@@ -56,7 +58,10 @@ app.put('/api/todos/:id',(req,res)=>{
     }
 
     Todos.findByIdAndUpdate(id, newTodo, {new: true})
-        .then(updateTodo => res.json(updateTodo))
+        .then(updateTodo => {
+            if (updateTodo) res.json(updateTodo)
+            else res.status(404).json({error:'Not found'})
+        })
         .catch(error => console.log(error))
 })
 
