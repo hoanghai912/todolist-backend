@@ -16,19 +16,20 @@ app.get('/',(req,res)=>{
     res.send('<h1>Welcome to Todo-list backend. Visit <a href="/api/todos">/api/todos</a> for more info</h1>')
 })
 
-app.get('/api/todos',(req,res)=>{
+app.get('/api/todos',(req,res,next)=>{
     Todos.find({})
         .then(todos => res.json(todos))
+        .catch(error => next(error))
 })
 
-app.get('/api/todos/:id',(req,res)=>{
+app.get('/api/todos/:id',(req,res,next)=>{
     const id = req.params.id
     Todos.findById(id)
         .then(todo => {
             if (todo) res.json(todo)
             else res.status(404).json({error:'Not found'})
         })
-        .catch(error => console.log(error))
+        .catch(error => next(error))
 })
 
 app.delete('/api/todos/:id',(req,res)=>{
@@ -38,7 +39,7 @@ app.delete('/api/todos/:id',(req,res)=>{
             if (todo) res.status(204).end()
             else res.status(404).json({error:'Not found'})
         })
-        .catch(error => console.log(error))
+        .catch(error => next(error))
 })
 
 app.put('/api/todos/:id',(req,res)=>{
@@ -62,7 +63,7 @@ app.put('/api/todos/:id',(req,res)=>{
             if (updateTodo) res.json(updateTodo)
             else res.status(404).json({error:'Not found'})
         })
-        .catch(error => console.log(error))
+        .catch(error => next(error))
 })
 
 app.post('/api/todos',(req,res)=>{
@@ -82,7 +83,7 @@ app.post('/api/todos',(req,res)=>{
 
     newTodo.save()
         .then(todo => res.json(todo))
-        .catch(error => console.log(error))
+        .catch(error => next(error))
 })
 
 // Unknown route
@@ -90,6 +91,17 @@ const unknownEndpoint = (req, res) => {
     return res.status(404).send({ error: 'unknown endpoint' })
 }
 app.use(unknownEndpoint)
+
+const errorHandler = (error, req, res, next) => {
+    console.error(error.message)
+
+    if (error.name === 'CastError') {
+        return res.status(400).send({ error: 'malformatted id' })
+    }
+
+    next(error)
+}
+app.use(errorHandler)
 
 const PORT= process.env.PORT
 app.listen(PORT,()=>console.log(`Server is running on PORT ${PORT}`))
