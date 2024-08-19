@@ -11,6 +11,9 @@ app.use(express.json())
 app.use(morgan('tiny'))
 app.use(cors())
 
+// Static files (Connect to front-end)
+app.use(express.static('dist'))
+
 // Routes
 app.get('/',(req,res)=>{
     res.send('<h1>Welcome to Todo-list backend. Visit <a href="/api/todos">/api/todos</a> for more info</h1>')
