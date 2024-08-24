@@ -9,11 +9,45 @@ mongoose.connect(url)
 mongoose.set('strictQuery', false)
 
 const todoSchema = new mongoose.Schema({
-    title: String,
-    complete: Boolean,
-    time: String,
-    date: String,
-    category: String
+    title: {
+        type: String,
+        required: true,
+    },
+    complete: {
+        type: Boolean,
+        required: true,
+    },
+    time: {
+        type: String,
+        validate: {
+            validator: function(v) {
+                return /\d{2}:\d{2}/.test(v)
+            },
+            message: props => `${props.value} is not a valid time`
+        },
+        required: true,
+    },
+    date: {
+        type: String,
+        validate: {
+            validator: function(v) {
+                return /\d{4}-\d{2}-\d{2}/.test(v)
+            },
+            message: props => `${props.value} is not a valid date`
+        },
+        require: true,
+    },
+    category: {
+        type: String,
+        validate: {
+            validator: function (v) {
+                console.log(v)
+                return ['work', 'personal', 'freelance'].includes(v.toLowerCase())
+            },
+            message: props => `${props.value} is not a valid category`
+        },
+        required: true
+    },
 })
 
 todoSchema.set('toJSON', {

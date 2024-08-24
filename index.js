@@ -35,7 +35,7 @@ app.get('/api/todos/:id',(req,res,next)=>{
         .catch(error => next(error))
 })
 
-app.delete('/api/todos/:id',(req,res)=>{
+app.delete('/api/todos/:id',(req,res,next)=>{
     const id = req.params.id
     Todos.findByIdAndDelete(id)
         .then(todo => {
@@ -45,13 +45,13 @@ app.delete('/api/todos/:id',(req,res)=>{
         .catch(error => next(error))
 })
 
-app.put('/api/todos/:id',(req,res)=>{
+app.put('/api/todos/:id',(req,res,next)=>{
     const id = req.params.id
     const body = req.body
-    const checkKeys = [ 'title', 'complete', 'time', 'date', 'category' ]
-    if (!checkKeys.every(key => key in body)) {
-        return res.status(400).json({error: 'Try again. Data is missing.'})
-    }
+    // const checkKeys = [ 'title', 'complete', 'time', 'date', 'category' ]
+    // if (!checkKeys.every(key => key in body)) {
+    //     return res.status(400).json({error: 'Try again. Data is missing.'})
+    // }
 
     const newTodo = {
         title: body.title, 
@@ -69,12 +69,12 @@ app.put('/api/todos/:id',(req,res)=>{
         .catch(error => next(error))
 })
 
-app.post('/api/todos',(req,res)=>{
+app.post('/api/todos',(req,res,next)=>{
     const body = req.body
-    const checkKeys = [ 'title', 'complete', 'time', 'date', 'category' ]
-    if (!checkKeys.every(key => key in body)) {
-        return res.status(400).json({error: 'Try again. Data is missing.'})
-    }
+    // const checkKeys = [ 'title', 'complete', 'time', 'date', 'category' ]
+    // if (!checkKeys.every(key => key in body)) {
+    //     return res.status(400).json({error: 'Try again. Data is missing.'})
+    // }
 
     const newTodo = new Todos({
         title: body.title, 
@@ -100,6 +100,9 @@ const errorHandler = (error, req, res, next) => {
 
     if (error.name === 'CastError') {
         return res.status(400).send({ error: 'malformatted id' })
+    }
+    if (error.name === 'ValidationError') {
+        return res.status(400).json({ error: error.message })
     }
 
     next(error)
