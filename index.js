@@ -56,6 +56,7 @@ app.put('/api/todos/:id',(req,res,next) => {
   const newTodo = {
     title: body.title,
     complete: Boolean(body.complete),
+    status: body.status,
     time: body.time,
     date: body.date,
     category: body.category
@@ -79,6 +80,7 @@ app.post('/api/todos',(req,res,next) => {
   const newTodo = new Todos({
     title: body.title,
     complete: Boolean(body.complete),
+    status: body.status,
     time: body.time,
     date: body.date,
     category: body.category

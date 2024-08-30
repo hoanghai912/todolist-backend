@@ -15,7 +15,16 @@ const todoSchema = new mongoose.Schema({
   },
   complete: {
     type: Boolean,
+    required: true
+  },
+  status: {
+    type: String,
     required: true,
+    validate: {
+      validator: function(v) {
+        return ['to-do', 'doing', 'done'].includes(v.toLowerCase())
+      }
+    }
   },
   time: {
     type: String,
